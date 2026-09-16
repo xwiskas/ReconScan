@@ -1,0 +1,6 @@
+app/data/
+**/__pycache__/
+**/*.pyc
+.git/
+*.md
+reconscan-prd.html

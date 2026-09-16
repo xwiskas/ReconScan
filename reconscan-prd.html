@@ -1,0 +1,539 @@
+<title>ReconScan PRD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#eef1f4; --border:#e3e7eb;
+    --ink:#16202b; --muted:#576675; --faint:#8695a3;
+    --accent:#0f8478; --accent-ink:#0a5c53; --accent-soft:#e3f2ef;
+    --crit:#cf473d; --high:#d9821f; --med:#b8901f; --low:#2f7fbf; --ok:#2c9e6b;
+    --shadow:0 1px 2px rgba(20,32,43,.04),0 6px 20px -12px rgba(20,32,43,.18);
+    --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+    --disp:"Archivo",var(--sans);
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --bg:#0e1419; --surface:#161f26; --surface-2:#1d2830; --border:#28343d;
+    --ink:#e6ebef; --muted:#9dadba; --faint:#6c7e8b;
+    --accent:#2bc3ae; --accent-ink:#82e2d4; --accent-soft:#12302b;
+    --crit:#e26a60; --high:#e6a24a; --med:#d8b64a; --low:#5aa4de; --ok:#4fc189;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px -14px rgba(0,0,0,.6);
+  }}
+  :root[data-theme="dark"]{
+    --bg:#0e1419; --surface:#161f26; --surface-2:#1d2830; --border:#28343d;
+    --ink:#e6ebef; --muted:#9dadba; --faint:#6c7e8b;
+    --accent:#2bc3ae; --accent-ink:#82e2d4; --accent-soft:#12302b;
+    --crit:#e26a60; --high:#e6a24a; --med:#d8b64a; --low:#5aa4de; --ok:#4fc189;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px -14px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
+    font-size:16px;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--accent-soft);color:var(--accent-ink)}
+  a{color:var(--accent-ink);text-decoration:none}
+  h1,h2,h3,h4{font-family:var(--disp);font-weight:800;line-height:1.15;text-wrap:balance;letter-spacing:-.01em}
+  code,kbd{font-family:var(--mono)}
+
+  /* layout */
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+  .grid{display:grid;grid-template-columns:230px minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:start}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+  /* header */
+  header.top{border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:20;
+    backdrop-filter:saturate(1.1)}
+  .topbar{display:flex;align-items:center;gap:16px;padding-block:14px}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--disp);font-weight:800;font-size:19px;letter-spacing:-.02em}
+  .radar{width:26px;height:26px;flex:none}
+  .brand .tld{color:var(--accent-ink)}
+  .top-meta{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .pill{font-family:var(--mono);font-size:11.5px;font-weight:500;padding:4px 9px;border-radius:999px;
+    border:1px solid var(--border);color:var(--muted);white-space:nowrap}
+  .pill.live{color:var(--accent-ink);border-color:color-mix(in srgb,var(--accent) 40%,transparent);background:var(--accent-soft)}
+  .tbtn{font:inherit;font-size:13px;cursor:pointer;background:var(--surface-2);border:1px solid var(--border);
+    color:var(--muted);border-radius:8px;padding:6px 10px;display:inline-flex;gap:6px;align-items:center}
+  .tbtn:hover{color:var(--ink)}
+
+  /* hero */
+  .hero{padding-block:clamp(38px,6vw,64px) clamp(30px,4vw,44px);border-bottom:1px solid var(--border)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);
+    font-weight:500;margin-bottom:18px}
+  .hero h1{font-size:clamp(34px,6vw,60px);margin:0 0 14px;line-height:1.02}
+  .hero .lede{font-size:clamp(17px,2vw,21px);color:var(--muted);max-width:60ch;margin:0}
+  .facts{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:26px;font-size:13.5px}
+  .facts div{display:flex;flex-direction:column;gap:2px}
+  .facts .k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .facts .v{color:var(--ink);font-weight:600}
+
+  /* toc */
+  nav.toc{position:sticky;top:78px;font-size:13.5px}
+  @media(max-width:860px){nav.toc{position:static;margin-bottom:8px;
+    border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--surface)}}
+  nav.toc .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  nav.toc ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+  nav.toc a{display:flex;gap:9px;color:var(--muted);padding:5px 8px;border-radius:7px;border-left:2px solid transparent}
+  nav.toc a:hover{color:var(--ink);background:var(--surface-2)}
+  nav.toc a.on{color:var(--accent-ink);border-left-color:var(--accent);background:var(--accent-soft)}
+  nav.toc a .n{font-family:var(--mono);font-size:11.5px;color:var(--faint);min-width:16px}
+  nav.toc a.on .n{color:var(--accent-ink)}
+
+  main{padding-block:clamp(30px,4vw,48px) 80px;min-width:0}
+  section{scroll-margin-top:80px;margin-bottom:clamp(40px,5vw,64px)}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+  .sec-head .num{font-family:var(--mono);font-size:13px;color:var(--accent-ink);font-weight:500;padding-top:4px}
+  .sec-head h2{font-size:clamp(22px,3vw,29px);margin:0}
+  p{max-width:68ch}
+  .prose p{color:var(--ink)}
+  .prose p+p{margin-top:14px}
+  strong{font-weight:600}
+
+  /* lifecycle strip */
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 4px}
+  .flow .step{font-family:var(--mono);font-size:13px;padding:8px 13px;border-radius:9px;border:1px solid var(--border);
+    color:var(--muted);background:var(--surface)}
+  .flow .step.done{color:var(--ink)}
+  .flow .step.here{color:#fff;background:var(--accent);border-color:var(--accent);font-weight:500;
+    box-shadow:0 4px 14px -6px color-mix(in srgb,var(--accent) 70%,transparent)}
+  :root[data-theme="dark"] .flow .step.here{color:#07100e}
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .flow .step.here{color:#07100e}}
+  .flow .arw{color:var(--faint);font-size:13px}
+  .flow-note{font-size:13px;color:var(--muted);margin-top:12px}
+
+  /* cards + grids */
+  .cards{display:grid;gap:14px}
+  .c2{grid-template-columns:repeat(2,1fr)} .c3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:720px){.c2,.c3{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 18px;box-shadow:var(--shadow)}
+  .card h4{margin:0 0 7px;font-size:15.5px}
+  .card p{font-size:14px;color:var(--muted);margin:0;max-width:none}
+  .card .tag{font-family:var(--mono);font-size:11px;color:var(--accent-ink);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:9px}
+
+  .goals-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.goals-2{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:20px 22px;box-shadow:var(--shadow)}
+  .panel.neg{background:var(--surface-2);box-shadow:none}
+  .panel h4{margin:0 0 14px;font-size:13px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  ul.clean{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px}
+  ul.clean li{display:flex;gap:11px;font-size:14.5px;color:var(--ink);line-height:1.5}
+  ul.clean li b{font-weight:600}
+  .mk{flex:none;width:19px;height:19px;margin-top:2px}
+  .mk.no{color:var(--crit)} .mk.go{color:var(--ok)}
+
+  /* command preview signature */
+  .cmd{background:#0d1519;border:1px solid #223038;border-radius:13px;overflow:hidden;box-shadow:var(--shadow)}
+  .cmd .bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #223038;background:#0a1216}
+  .cmd .bar .dot{width:10px;height:10px;border-radius:50%;background:#33454e}
+  .cmd .bar .ttl{font-family:var(--mono);font-size:11.5px;color:#7c93a0;margin-left:6px;letter-spacing:.06em;text-transform:uppercase}
+  .cmd .body{padding:16px 16px 6px;font-family:var(--mono);font-size:14px;line-height:1.9;color:#cfe0e8;overflow-x:auto}
+  .cmd .body .prompt{color:#39c9b3}
+  .tok{border-bottom:1px dashed #3a5560;padding-bottom:1px;cursor:help;position:relative;white-space:nowrap}
+  .tok .flg{color:#7fd2c4}
+  .cmd .exp{display:flex;flex-wrap:wrap;gap:8px;padding:6px 16px 16px}
+  .cmd .exp span{font-family:var(--mono);font-size:11.5px;color:#8fa5b1;background:#132027;border:1px solid #223038;border-radius:7px;padding:4px 9px}
+  .cmd .exp b{color:#7fd2c4;font-weight:500}
+  .sig-note{font-size:13.5px;color:var(--muted);margin-top:12px}
+
+  /* architecture */
+  .arch{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}
+  @media(max-width:720px){.arch{grid-template-columns:1fr}.arch .link{transform:rotate(90deg)}}
+  .node{border:1px solid var(--border);border-radius:13px;background:var(--surface);padding:16px 18px;box-shadow:var(--shadow)}
+  .node .hd{font-family:var(--disp);font-weight:700;font-size:15px;margin-bottom:4px}
+  .node .sub{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+  .node ul{margin:0;padding-left:16px;font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+  .link{text-align:center;color:var(--accent-ink);font-family:var(--mono);font-size:11px}
+  .link .line{font-size:20px;letter-spacing:-2px}
+
+  /* table */
+  .twrap{overflow-x:auto;border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px;background:var(--surface)}
+  th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--border);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:none}
+  td .f{font-weight:600}
+  td code{font-size:12.5px;background:var(--surface-2);padding:1px 6px;border-radius:5px;color:var(--accent-ink)}
+
+  /* checklist caps */
+  .caps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:720px){.caps{grid-template-columns:1fr}}
+  .cap{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 15px}
+  .cap .ck{flex:none;width:22px;height:22px;color:var(--ok)}
+  .cap b{font-size:14.5px}.cap p{margin:2px 0 0;font-size:13px;color:var(--muted);max-width:none}
+
+  /* severity legend */
+  .sevs{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .sev{font-family:var(--mono);font-size:12px;padding:4px 10px 4px 8px;border-radius:999px;display:inline-flex;gap:7px;align-items:center;border:1px solid var(--border)}
+  .sev i{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+  /* code block */
+  pre.block{background:#0d1519;border:1px solid #223038;border-radius:13px;padding:18px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:13px;line-height:1.75;color:#cfe0e8;box-shadow:var(--shadow)}
+  pre.block .c{color:#5f7784}
+  pre.block .key{color:#7fd2c4}
+
+  /* milestones */
+  .miles{position:relative;padding-left:26px}
+  .miles::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--border)}
+  .mile{position:relative;padding:0 0 20px 4px}
+  .mile:last-child{padding-bottom:0}
+  .mile .dot{position:absolute;left:-24px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
+  .mile.ph .dot{border-color:var(--faint)}
+  .mile .m{font-family:var(--mono);font-size:12px;color:var(--accent-ink);font-weight:500}
+  .mile.ph .m{color:var(--faint)}
+  .mile .t{font-size:14.5px;margin-top:2px}
+
+  /* open questions / resolved */
+  .oq{background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 32%,transparent);border-radius:13px;padding:18px 20px}
+  .oq h4{margin:0 0 6px;font-size:15px;color:var(--accent-ink)}
+  .oq p{margin:0;font-size:14px;color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .chip{font-family:var(--mono);font-size:12px;padding:5px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--border);color:var(--muted);display:inline-flex;gap:7px;align-items:center}
+  .chip .ck{width:14px;height:14px;color:var(--ok)}
+
+  .callout{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 11px 11px 0;padding:14px 18px;font-size:14px;color:var(--ink);margin-top:16px}
+  .callout b{color:var(--accent-ink)}
+
+  footer{border-top:1px solid var(--border);padding-block:26px 40px;color:var(--faint);font-size:13px;font-family:var(--mono)}
+  .lead-in{font-size:14px;color:var(--muted);margin:-6px 0 20px;max-width:68ch}
+  @media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+
+<header class="top">
+  <div class="wrap topbar">
+    <span class="brand">
+      <svg class="radar" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="13" stroke="var(--accent)" stroke-width="1.6" opacity=".35"/>
+        <circle cx="16" cy="16" r="8.5" stroke="var(--accent)" stroke-width="1.6" opacity=".55"/>
+        <circle cx="16" cy="16" r="2.3" fill="var(--accent)"/>
+        <path d="M16 16 L28 9" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="23" cy="11.5" r="1.8" fill="var(--accent-ink)"/>
+      </svg>
+      Recon<span class="tld">Scan</span>
+    </span>
+    <div class="top-meta">
+      <span class="pill">PRD · Draft v0.2</span>
+      <span class="pill live">Scanning phase</span>
+      <button class="tbtn" id="theme" aria-label="Toggle color theme">◐ Theme</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Product Requirements · Authorized lab use</div>
+    <h1>A scanning cockpit that<br>explains every move.</h1>
+    <p class="lede">ReconScan wraps the real pentest scanning tools in a clean, beginner-friendly dashboard — so you always know what a command does, why you're running it, and what the results mean.</p>
+    <div class="facts">
+      <div><span class="k">Owner</span><span class="v">Sebastian</span></div>
+      <div><span class="k">Purpose</span><span class="v">Class pentest engagement</span></div>
+      <div><span class="k">Platform</span><span class="v">Web app · engine on Kali</span></div>
+      <div><span class="k">Audience</span><span class="v">New to cybersecurity</span></div>
+      <div><span class="k">Status</span><span class="v">Draft — 1 open question</span></div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap grid">
+  <nav class="toc" aria-label="Contents">
+    <div class="lbl">Contents</div>
+    <ol id="toc">
+      <li><a href="#summary"><span class="n">01</span> Summary</a></li>
+      <li><a href="#context"><span class="n">02</span> Context &amp; problem</a></li>
+      <li><a href="#goals"><span class="n">03</span> Goals &amp; non-goals</a></li>
+      <li><a href="#principles"><span class="n">04</span> Design principles</a></li>
+      <li><a href="#ux"><span class="n">05</span> UI / UX direction</a></li>
+      <li><a href="#signature"><span class="n">06</span> Signature: command preview</a></li>
+      <li><a href="#safety"><span class="n">07</span> Legal &amp; safety</a></li>
+      <li><a href="#arch"><span class="n">08</span> Architecture</a></li>
+      <li><a href="#scope"><span class="n">09</span> Feature scope</a></li>
+      <li><a href="#tools"><span class="n">10</span> Tools inventory</a></li>
+      <li><a href="#data"><span class="n">11</span> Data model</a></li>
+      <li><a href="#stack"><span class="n">12</span> Tech stack</a></li>
+      <li><a href="#metrics"><span class="n">13</span> Success metrics</a></li>
+      <li><a href="#milestones"><span class="n">14</span> Milestones</a></li>
+      <li><a href="#open"><span class="n">15</span> Open questions</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section id="summary" class="prose">
+      <div class="sec-head"><span class="num">01</span><h2>Summary</h2></div>
+      <p>ReconScan is a <strong>web application</strong> that acts as a friendly control panel for the scanning phase of a penetration test. It wraps the real, industry-standard tools — nmap, masscan, nuclei, nmap NSE scripts, and web scanners like nikto, whatweb and gobuster — behind a <strong>clean dashboard</strong> that explains what each tool and option does, shows the exact command before it runs, streams live results, and interprets those results in plain English with a suggested next step.</p>
+      <p>It's built for someone <strong>new to cybersecurity</strong> — every screen teaches — while still exposing the full advanced power of the underlying tools. The engine runs on <strong>Kali Linux</strong> (where the tools live) and is used from a browser on any device, with <strong>no login</strong> (LAN-only). A built-in <strong>Demo / Learn mode</strong> lets you explore every feature with realistic sample output before firing a single real scan.</p>
+    </section>
+
+    <section id="context" class="prose">
+      <div class="sec-head"><span class="num">02</span><h2>Context &amp; problem</h2></div>
+      <p>Recon is done. ReconScan owns the next step in the pentest lifecycle and bridges into enumeration via service/version detection:</p>
+      <div class="flow" role="img" aria-label="Pentest lifecycle: Recon done, Scanning is the current phase">
+        <span class="step done">Recon ✓</span><span class="arw">→</span>
+        <span class="step here">Scanning</span><span class="arw">→</span>
+        <span class="step">Enumeration</span><span class="arw">→</span>
+        <span class="step">Exploitation</span><span class="arw">→</span>
+        <span class="step">Reporting</span>
+      </div>
+      <p class="flow-note">Recon output (a list of hosts / IPs / URLs) imports straight in as targets — no retyping.</p>
+      <p style="margin-top:22px">Beginners hit two walls at this stage. <strong>The tools are cryptic</strong> — <code style="font-family:var(--mono);font-size:13px">nmap -sS -sV -O -p- --min-rate 1000 -T4</code> means nothing to a newcomer, and a wrong flag can be slow, noisy, or useless. And <strong>the results are cryptic</strong> — a wall of ports and banners doesn't tell you what matters or what to do next. ReconScan removes both walls <strong>without hiding the real tools</strong>, so you learn the actual craft with training wheels you can take off as you grow.</p>
+    </section>
+
+    <section id="goals">
+      <div class="sec-head"><span class="num">03</span><h2>Goals &amp; non-goals</h2></div>
+      <div class="goals-2">
+        <div class="panel">
+          <h4>Goals</h4>
+          <ul class="clean">
+            <li><svg class="mk go" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Teach while doing</b> — every tool, option and result explained in plain language.</span></li>
+            <li><svg class="mk go" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Never click blind</b> — always show the exact command and why, before it runs.</span></li>
+            <li><svg class="mk go" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Genuinely powerful</b> — full access to the real tools, no artificial limits.</span></li>
+            <li><svg class="mk go" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Safe by default</b> — sensible defaults, guardrails, authorization acknowledged.</span></li>
+            <li><svg class="mk go" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Testable safely</b> — Demo mode plus support for legal practice targets.</span></li>
+            <li><svg class="mk go" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Produce a deliverable</b> — export findings to a class-ready report, your choice of format.</span></li>
+          </ul>
+        </div>
+        <div class="panel neg">
+          <h4>Non-goals</h4>
+          <ul class="clean">
+            <li><svg class="mk no" viewBox="0 0 20 20" fill="none"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span><b>Not an exploitation tool</b> — no exploits, payloads, or Metasploit. Scanning &amp; enumeration only.</span></li>
+            <li><svg class="mk no" viewBox="0 0 20 20" fill="none"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span><b>Not a recon tool</b> — recon is done; we only import its output.</span></li>
+            <li><svg class="mk no" viewBox="0 0 20 20" fill="none"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span><b>Not a CLI replacement</b> — it teaches the command line, it doesn't hide it forever.</span></li>
+            <li><svg class="mk no" viewBox="0 0 20 20" fill="none"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span><b>Not for unauthorized targets</b> — the app gates scanning of anything you don't have permission for.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="principles">
+      <div class="sec-head"><span class="num">04</span><h2>Design principles</h2></div>
+      <div class="cards c3">
+        <div class="card"><span class="tag">01 · Clarity</span><h4>Explain everything</h4><p>No unlabeled buttons. Hover for a tooltip, click "?" for a deeper explanation — the same pattern everywhere.</p></div>
+        <div class="card"><span class="tag">02 · Transparency</span><h4>Show the command</h4><p>The generated CLI command is always visible and copy-able. This is the core teaching feature.</p></div>
+        <div class="card"><span class="tag">03 · Freedom</span><h4>Guardrails, not walls</h4><p>Warn and confirm on risky, slow, or noisy actions — but never forbid learning.</p></div>
+        <div class="card"><span class="tag">04 · Progression</span><h4>Progressive disclosure</h4><p>Beginners get a clean guided flow; "Advanced" reveals raw flags and expert options one click away.</p></div>
+        <div class="card"><span class="tag">05 · Meaning</span><h4>Interpret, don't dump</h4><p>Results always carry a plain-English "what this means / what's interesting / what to do next."</p></div>
+        <div class="card"><span class="tag">06 · Safety</span><h4>Safe by default</h4><p>Conservative timing and scope defaults, Demo mode available, authorization acknowledged up front.</p></div>
+      </div>
+    </section>
+
+    <section id="ux" class="prose">
+      <div class="sec-head"><span class="num">05</span><h2>UI / UX direction</h2></div>
+      <p>A <strong>clean, light dashboard</strong> — calm and modern, not a cluttered "hacker console." A simple left-nav layout keeps everything one click away:</p>
+      <div class="flow" style="margin-top:14px">
+        <span class="step">Dashboard</span><span class="step">Targets</span><span class="step here">New Scan</span><span class="step">Results</span><span class="step">Reports</span><span class="step">Learn / Glossary</span>
+      </div>
+      <p style="margin-top:20px">The guided path is front and center; advanced options live behind an "Advanced" toggle. Every tool, option and result uses the same "?" affordance and the same <strong>what / why / next</strong> structure — learn the pattern once, know it everywhere. It's always obvious whether you're in <strong>Demo mode</strong> or running <strong>real scans</strong>, and whether a scan is queued, running, or done.</p>
+    </section>
+
+    <section id="signature">
+      <div class="sec-head"><span class="num">06</span><h2>Signature feature — the command preview</h2></div>
+      <p class="lead-in">Before any scan runs, ReconScan shows the exact command a pro would type, with every flag explained. Hover a flag to learn what it does. This is what turns "clicking buttons" into "learning the craft."</p>
+      <div class="cmd">
+        <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">Command preview · Goal: identify services on target</span></div>
+        <div class="body">
+          <span class="prompt">$</span> nmap
+          <span class="tok"><span class="flg">-sV</span></span>
+          <span class="tok"><span class="flg">-O</span></span>
+          <span class="tok"><span class="flg">-p</span> 1-1000</span>
+          <span class="tok"><span class="flg">-T4</span></span>
+          <span class="tok">10.10.14.7</span>
+        </div>
+        <div class="exp">
+          <span><b>-sV</b> detect service &amp; version</span>
+          <span><b>-O</b> guess the operating system</span>
+          <span><b>-p 1-1000</b> scan the first 1000 ports</span>
+          <span><b>-T4</b> faster timing (a bit noisier)</span>
+          <span><b>10.10.14.7</b> your in-scope target</span>
+        </div>
+      </div>
+      <p class="sig-note">Every explanation is copy-able and links into the glossary. The "-T4" chip is exactly the kind of choice that triggers a friendly "here's the trade-off" confirmation (see §07).</p>
+    </section>
+
+    <section id="safety">
+      <div class="sec-head"><span class="num">07</span><h2>Legal, safety &amp; authorization</h2></div>
+      <p class="lead-in" style="max-width:68ch">Scanning a system you don't own or have written permission to test is illegal in most places. Because ReconScan makes scanning <em>easy</em>, it must make <em>responsible use</em> easy too.</p>
+      <div class="cards c2">
+        <div class="card"><span class="tag">A1</span><h4>Authorization acknowledgement</h4><p>Each project records what authorizes it — class lab, your own VM, scanme.nmap.org, an instructor scope doc.</p></div>
+        <div class="card"><span class="tag">A2</span><h4>Scope allow-list</h4><p>Targets live in a defined scope. Scans of anything outside it are blocked with a clear warning.</p></div>
+        <div class="card"><span class="tag">A3</span><h4>Guardrails on aggressive options</h4><p>Noisy or slow choices (<code>-T5</code>, full <code>-p-</code>, aggressive NSE) get a plain-English "what &amp; why" confirm.</p></div>
+        <div class="card"><span class="tag">A4</span><h4>Audit log</h4><p>Every scan — command, target, time — is recorded. Good practice, and useful for your class report.</p></div>
+        <div class="card"><span class="tag">A5</span><h4>Injection-safe execution</h4><p>Commands are built as validated argument arrays. User input is <b>never</b> spliced into a shell string.</p></div>
+        <div class="card"><span class="tag">A6</span><h4>Authorized-use notice</h4><p>An unmissable first-run notice links to a plain-English ethics &amp; legal primer.</p></div>
+      </div>
+      <div class="callout"><b>Note on "no login."</b> Because there's no authentication, the backend must only listen on localhost or your trusted LAN — never expose it to the open internet. This is designed in so it can't be forgotten.</div>
+    </section>
+
+    <section id="arch">
+      <div class="sec-head"><span class="num">08</span><h2>Architecture</h2></div>
+      <p class="lead-in">Engine on Kali, client anywhere. The backend runs where the tools are installed and serves the UI to your browser over the LAN. Demo mode swaps real tool calls for realistic fixtures — same UI, zero risk.</p>
+      <div class="arch">
+        <div class="node">
+          <div class="hd">Browser client</div>
+          <div class="sub">Windows / any device</div>
+          <ul><li>React web UI</li><li>Guided scan builder</li><li>Live results view</li><li>No login (LAN only)</li></ul>
+        </div>
+        <div class="link"><div class="line">⇄</div>HTTP<br>+ WebSocket</div>
+        <div class="node">
+          <div class="hd">Kali Linux host</div>
+          <div class="sub">Engine + real tools</div>
+          <ul><li>FastAPI orchestrator &amp; queue</li><li>Output parsers → structured findings</li><li>nmap · masscan · nuclei · nikto …</li><li>SQLite: projects · scans · results</li></ul>
+        </div>
+      </div>
+      <p style="margin-top:16px;color:var(--muted);font-size:14px;max-width:68ch">Long scans stream progress and output live; you can stop a running scan at any time. The same backend can later be packaged as <strong>Docker</strong> to run anywhere without a Kali install.</p>
+    </section>
+
+    <section id="scope">
+      <div class="sec-head"><span class="num">09</span><h2>Feature scope — MVP</h2></div>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>#</th><th>Feature</th><th>What it does</th><th>Beginner layer</th></tr></thead>
+          <tbody>
+            <tr><td>F1</td><td class="f">Project workspace</td><td>One project per assignment; holds scope, scans, results.</td><td>Setup wizard + authorization acknowledgement.</td></tr>
+            <tr><td>F2</td><td class="f">Targets &amp; scope</td><td>Add hosts / IPs / ranges; import recon output.</td><td>Validates input, explains CIDR &amp; ranges.</td></tr>
+            <tr><td>F3</td><td class="f">Guided Scan Builder</td><td>Pick a goal → app assembles the right tool &amp; flags.</td><td>Plain-English goals + live command preview.</td></tr>
+            <tr><td>F4</td><td class="f">Tool catalog</td><td>nmap, masscan, nuclei, NSE, nikto, whatweb, gobuster…</td><td>"What / why / when" cards + raw mode.</td></tr>
+            <tr><td>F5</td><td class="f">Execution engine</td><td>Runs the real command (or demo), streams live output, stoppable.</td><td>Progress bar + "what's happening now."</td></tr>
+            <tr><td>F6</td><td class="f">Parsed results</td><td>Ports, services, OS, vulns, web findings + raw toggle.</td><td>Color-coded severity, plain labels.</td></tr>
+            <tr><td>F7</td><td class="f">Explain + next step</td><td>Explains each finding and suggests the logical next action.</td><td>"445/SMB open → next: enumerate shares."</td></tr>
+            <tr><td>F8</td><td class="f">Scan history</td><td>List, re-open, re-run, delete past scans.</td><td>Timeline view.</td></tr>
+            <tr><td>F9</td><td class="f">Demo / Learn mode</td><td>Full UI with realistic canned output, no real scanning.</td><td>Clearly labeled "DEMO" toggle.</td></tr>
+            <tr><td>F10</td><td class="f">Glossary &amp; help</td><td>Searchable plain-English definitions.</td><td>Linked everywhere via "?" icons.</td></tr>
+            <tr><td>F11</td><td class="f">Report export</td><td>Export findings for submission.</td><td>Choose <code>Markdown</code> · <code>PDF</code> · <code>HTML</code> · <code>JSON</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:16px;margin:26px 0 12px">Scan capabilities in scope — no tool limit</h3>
+      <div class="caps">
+        <div class="cap"><svg class="ck" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Host discovery + port scanning</b><p>nmap discovery, TCP/UDP scans, masscan for fast large-range sweeps.</p></div></div>
+        <div class="cap"><svg class="ck" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Service / version / OS detection</b><p><code>nmap -sV -O</code> and banner grabbing — bridges into enumeration.</p></div></div>
+        <div class="cap"><svg class="ck" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Vulnerability scanning</b><p>NSE <code>vuln</code> scripts + nuclei templates, with severity &amp; CVE explanations.</p></div></div>
+        <div class="cap"><svg class="ck" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Web app / server scanning</b><p>nikto, whatweb, gobuster / dirb, nuclei web templates.</p></div></div>
+      </div>
+      <div class="sevs" aria-label="Severity legend">
+        <span class="sev"><i style="background:var(--crit)"></i>Critical</span>
+        <span class="sev"><i style="background:var(--high)"></i>High</span>
+        <span class="sev"><i style="background:var(--med)"></i>Medium</span>
+        <span class="sev"><i style="background:var(--low)"></i>Low</span>
+        <span class="sev"><i style="background:var(--ok)"></i>Info / OK</span>
+      </div>
+    </section>
+
+    <section id="tools">
+      <div class="sec-head"><span class="num">10</span><h2>Tools inventory</h2></div>
+      <p class="lead-in">A starter set — the catalog has no hard limit; new tools drop in via the same "tool card" pattern.</p>
+      <div class="cards c2">
+        <div class="card"><span class="tag">Port · Service · OS · NSE</span><h4>nmap</h4><p>"The Swiss-army knife of scanning — finds open ports, what's running, and known issues."</p></div>
+        <div class="card"><span class="tag">Ultra-fast port scan</span><h4>masscan</h4><p>"Very fast at finding open ports across many hosts — great first pass, less detail than nmap."</p></div>
+        <div class="card"><span class="tag">Template vuln scan</span><h4>nuclei</h4><p>"Checks targets against a big library of known-issue templates."</p></div>
+        <div class="card"><span class="tag">nmap scripts</span><h4>NSE (vuln / safe / default)</h4><p>"Mini-programs that extend nmap — e.g. check for specific vulnerabilities."</p></div>
+        <div class="card"><span class="tag">Web server scan</span><h4>nikto</h4><p>"Checks a web server for known issues and misconfigurations."</p></div>
+        <div class="card"><span class="tag">Web fingerprint</span><h4>whatweb</h4><p>"Identifies what a website is built with — server, CMS, frameworks."</p></div>
+        <div class="card"><span class="tag">Content discovery</span><h4>gobuster / dirb</h4><p>"Finds hidden pages and directories on a web server."</p></div>
+        <div class="card" style="border-style:dashed;box-shadow:none;background:var(--surface-2)"><span class="tag">Extensible</span><h4>…more, on request</h4><p>Any tool can be added through the same explained tool-card pattern.</p></div>
+      </div>
+    </section>
+
+    <section id="data">
+      <div class="sec-head"><span class="num">11</span><h2>Data model sketch</h2></div>
+<pre class="block"><span class="key">Project</span>      (id, name, authorization_note, created_at)
+  ├─ <span class="key">Target</span>   (id, project_id, value, type[host|ip|cidr|range|url], in_scope)
+  ├─ <span class="key">Scan</span>     (id, project_id, tool, goal, command_args[], status, is_demo, timing)
+  │     ├─ <span class="key">RawOutput</span>  (scan_id, stdout, stderr, exit_code)
+  │     └─ <span class="key">Finding</span>    (id, scan_id, target, type[port|service|os|vuln|web],
+  │                     data{port, proto, state, service, version, cve, severity},
+  │                     interpretation, suggested_next_step)
+  └─ <span class="key">AuditEntry</span> (id, project_id, action, command, timestamp)
+
+<span class="c"># Command-injection safety: target/port values are validated against strict</span>
+<span class="c"># patterns and passed as individual args — never assembled into a shell string.</span></pre>
+    </section>
+
+    <section id="stack">
+      <div class="sec-head"><span class="num">12</span><h2>Tech stack <span style="font-family:var(--sans);font-weight:400;font-size:15px;color:var(--faint)">— recommendation</span></h2></div>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Layer</th><th>Choice</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td class="f">Backend</td><td><code>Python · FastAPI</code></td><td>Native to Kali; great subprocess handling; easy WebSockets.</td></tr>
+            <tr><td class="f">Scan parsing</td><td><code>libnmap</code> · JSON out</td><td>Structured results instead of scraping text.</td></tr>
+            <tr><td class="f">Frontend</td><td><code>React (Vite)</code></td><td>Fast to build a clean, light dashboard with rich tooltips.</td></tr>
+            <tr><td class="f">Realtime</td><td><code>WebSocket</code></td><td>Live scan output streaming.</td></tr>
+            <tr><td class="f">Storage</td><td><code>SQLite</code></td><td>Zero-config, perfect for a single-user class project.</td></tr>
+            <tr><td class="f">Report export</td><td>Markdown → PDF / HTML</td><td>Multi-format export from one source.</td></tr>
+            <tr><td class="f">Packaging</td><td>Native now · Docker later</td><td>Simple to start, portable in Phase 2.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="metrics">
+      <div class="sec-head"><span class="num">13</span><h2>Success metrics</h2></div>
+      <div class="cards c2">
+        <div class="card"><h4>&lt; 5 min to first scan</h4><p>A total beginner goes from opening the app to a running scan in under five minutes.</p></div>
+        <div class="card"><h4>≥ 80% comprehension</h4><p>User can explain, in their own words, what a scan did and what a finding means — unaided.</p></div>
+        <div class="card"><h4>Zero blind clicks</h4><p>Every action in the UI has an explanation available right at that spot.</p></div>
+        <div class="card"><h4>A real deliverable</h4><p>User produces a class-ready report from real results, in their chosen format.</p></div>
+      </div>
+    </section>
+
+    <section id="milestones">
+      <div class="sec-head"><span class="num">14</span><h2>Milestones</h2></div>
+      <div class="miles">
+        <div class="mile"><span class="dot"></span><div class="m">M0 · Skeleton</div><div class="t">Project &amp; target CRUD, DB, clean dashboard shell, Demo mode end-to-end.</div></div>
+        <div class="mile"><span class="dot"></span><div class="m">M1 · nmap core</div><div class="t">Guided builder → command preview → real execution → live output → parsed ports/services.</div></div>
+        <div class="mile"><span class="dot"></span><div class="m">M2 · Interpretation layer</div><div class="t">Result explanations, next-step suggestions, glossary.</div></div>
+        <div class="mile"><span class="dot"></span><div class="m">M3 · Vuln scanning</div><div class="t">NSE vuln + nuclei with severity &amp; CVE explanations.</div></div>
+        <div class="mile"><span class="dot"></span><div class="m">M4 · masscan + OS + history</div><div class="t">Fast sweeps, OS detection, scan history timeline.</div></div>
+        <div class="mile"><span class="dot"></span><div class="m">M5 · Web scanning</div><div class="t">nikto, whatweb, gobuster.</div></div>
+        <div class="mile"><span class="dot"></span><div class="m">M6 · Report export</div><div class="t">Markdown / PDF / HTML / JSON.</div></div>
+        <div class="mile ph"><span class="dot"></span><div class="m">Phase 2</div><div class="t">Scan diff, saved templates, scheduling, Docker deploy, learning quizzes.</div></div>
+      </div>
+    </section>
+
+    <section id="open">
+      <div class="sec-head"><span class="num">15</span><h2>Open questions</h2></div>
+      <div class="oq">
+        <h4>1 · Recon import format</h4>
+        <p>What does your recon output look like right now — a plain text list of IPs, or a specific tool's export file? That tells me how to build the importer. <em>Default if unsure:</em> paste a list of hosts / IPs / URLs (one per line), plus common file uploads.</p>
+      </div>
+      <div class="chips">
+        <span class="chip"><svg class="ck" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>No login · LAN-only</span>
+        <span class="chip"><svg class="ck" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Report: MD / PDF / HTML / JSON</span>
+        <span class="chip"><svg class="ck" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Clean light dashboard</span>
+        <span class="chip"><svg class="ck" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Name: ReconScan</span>
+        <span class="chip"><svg class="ck" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>No tool limits · web scanning in MVP</span>
+      </div>
+      <p style="color:var(--muted);font-size:14px;margin-top:20px">Also out of scope for v1: exploitation, payloads, brute-forcing, recon/OSINT gathering, unauthorized targets, and mobile-native apps.</p>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">ReconScan · PRD Draft v0.2 · Authorized lab use only · Next: confirm recon import format, then build MVP M0–M2.</div>
+</footer>
+
+<script>
+  // theme toggle
+  (function(){
+    var btn=document.getElementById('theme'), root=document.documentElement;
+    btn.addEventListener('click',function(){
+      var cur=root.getAttribute('data-theme');
+      var next = cur==='dark' ? 'light' : cur==='light' ? 'dark'
+        : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark');
+      root.setAttribute('data-theme',next);
+    });
+  })();
+  // scrollspy for TOC
+  (function(){
+    var links=[].slice.call(document.querySelectorAll('#toc a'));
+    var map={}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)]=a; });
+    var obs=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(l){l.classList.remove('on');});
+          var a=map[e.target.id]; if(a) a.classList.add('on');
+        }
+      });
+    },{rootMargin:'-20% 0px -70% 0px'});
+    document.querySelectorAll('main section[id]').forEach(function(s){obs.observe(s);});
+  })();
+</script>

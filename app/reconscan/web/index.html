@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReconScan</title>
+  <link rel="icon" href="/static/favicon.ico" sizes="any">
+  <link rel="icon" href="/static/reconscan.png" type="image/png">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div id="app">
+    <nav class="sidebar">
+      <div class="brand">
+        <h1><span class="dot"></span> ReconScan</h1>
+        <p>Scanning phase cockpit</p>
+      </div>
+      <div class="navlinks" id="nav"></div>
+      <div class="sidefoot">
+        <strong>Authorized use only.</strong><br>
+        Scan only systems you have written permission to test.
+        <a href="#" id="ethicsLink">Read why &rsaquo;</a>
+      </div>
+    </nav>
+    <main>
+      <header class="topbar" id="topbar"></header>
+      <div id="view" class="view"></div>
+      <div class="legalbar">
+        Scanning a system without permission is a criminal offence in most jurisdictions.
+        ReconScan records every command it runs and refuses targets outside a project's declared scope.
+      </div>
+    </main>
+  </div>
+
+  <aside id="drawer" aria-hidden="true">
+    <div class="dhead">
+      <h4 id="drawerTitle"></h4>
+      <button class="btn ghost sm" id="drawerClose">Close</button>
+    </div>
+    <div class="dbody" id="drawerBody"></div>
+  </aside>
+
+  <div id="toasts"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

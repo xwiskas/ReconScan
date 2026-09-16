@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.env
+
+# Database
+*.sqlite3
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Docker
+.docker/
+
+# Logs
+*.log
+
+# Local config
+config.local.py
+*.local.py
+
+# Windows
+*.lnk
+
+# Test coverage
+.coverage
+htmlcov/
+
+# pytest
+.pytest_cache/
+
+# MyPy
+.mypy_cache/

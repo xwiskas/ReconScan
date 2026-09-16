@@ -1,0 +1,53 @@
+# ReconScan - docker compose up --build
+#
+# Binding to 0.0.0.0 inside the container puts ReconScan in LAN mode, so it
+# generates a self-signed certificate on first start and requires a login. The
+# first page you see will ask you to create the single account.
+#
+#   https://localhost:8000
+#
+# Your browser will warn once that the certificate is not trusted. That warning
+# is accurate - a self-signed certificate proves nothing about identity. It still
+# encrypts the connection, which is the point.
+
+name: reconscan
+
+services:
+  reconscan:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: reconscan:latest
+    container_name: reconscan
+    restart: unless-stopped
+
+    ports:
+      - "8000:8000"
+
+    # Raw packet crafting only. Not `privileged: true` - these two capabilities
+    # are all that SYN scans, OS detection, UDP scans and masscan actually need.
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+
+    # Projects, scans, findings and the TLS certificate. Without this volume a
+    # rebuild throws your engagement away.
+    volumes:
+      - reconscan-data:/data
+
+    environment:
+      RECONSCAN_HOST: "0.0.0.0"       # LAN mode: HTTPS + login required
+      RECONSCAN_PORT: "8000"
+      RECONSCAN_DEMO: "0"             # real scans by default; toggle per scan in the UI
+      RECONSCAN_DATA_DIR: "/data"
+      RECONSCAN_SESSION_TTL_HOURS: "12"
+
+    # To scan machines on your own LAN rather than just other containers,
+    # comment out the `ports:` block above and uncomment this. The container then
+    # shares the host's network stack, so ReconScan is reachable at
+    # https://<host-ip>:8000 and can see everything the host can.
+    #
+    # network_mode: host
+
+volumes:
+  reconscan-data:
