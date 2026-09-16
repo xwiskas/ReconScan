@@ -48,7 +48,7 @@ ReconScan removes both walls **without hiding the real tools**, so you learn the
 
 ## 4. Target user
 
-**Primary:** *Sebastian* — a student new to cybersecurity, working through an authorized pentest class lab. Comfortable with computers, **not** yet comfortable with Linux CLI security tooling. Needs to *understand* every action.
+**Primary:** *Student* — a student new to cybersecurity, working through an authorized pentest class lab. Comfortable with computers, **not** yet comfortable with Linux CLI security tooling. Needs to *understand* every action.
 
 **Design implication:** Default everything to the explained, guided path. Make "advanced/raw" power opt-in, one click away, never the default.
 

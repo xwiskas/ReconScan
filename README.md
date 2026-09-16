@@ -70,29 +70,6 @@ packets - for those, run `sudo ./run.sh` from a terminal.
 The icon is drawn in code by [app/reconscan/icon.py](app/reconscan/icon.py), which writes the
 `.ico` and `.png` by hand rather than adding an image library to a project that has none.
 
-### Portable (USB stick)
-
-```bash
-python make_portable.py --dest E:/ReconScan
-```
-
-That copies the app to the stick and downloads its Python dependencies into it, so it runs on a
-machine where nothing is installed. Then `run.bat` (double-click on Windows) or `./run.sh`
-(Linux/macOS). About 33 MB.
-
-Your projects, scans and reports live in `app/data/` next to the application, so **they travel
-with the stick** — plug it into another machine and your engagement is still there.
-
-Three things to know:
-
-- **The dependency folder is platform-specific.** A few packages ship compiled code, so
-  `_vendor/win-amd64-py3.12/` will not run on Kali. Run `make_portable.py` again on each
-  platform; the folders sit side by side and `launch.py` picks the right one. If it can't find a
-  match it says so and prints the exact command to fix it.
-- **Python itself is not on the stick.** The machine you plug into needs Python 3.11+. Kali
-  always has it.
-- **Two of the six scanning tools can ride along; four cannot.** See below.
-
 ### Carrying the scanning tools
 
 ```bash
