@@ -50,3 +50,4 @@ htmlcov/
 
 # MyPy
 .mypy_cache/
+app/tools/win-amd64/*.exe
